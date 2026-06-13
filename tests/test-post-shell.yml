@@ -1,0 +1,27 @@
+name: Test post-shell input
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          run: echo "run step executed" > /tmp/post-shell-run.txt
+          post: echo "post step with sh shell" > /tmp/post-shell-result.txt
+          post-shell: sh
+      - name: Assert run step executed
+        run: |
+          if [ ! -f /tmp/post-shell-run.txt ]; then
+            echo "FAIL: run step did not create output file"
+            exit 1
+          fi
+          content=$(cat /tmp/post-shell-run.txt)
+          echo "actual: $content"
+          if [ "$content" != "run step executed" ]; then
+            echo "FAIL: expected 'run step executed', got '$content'"
+            exit 1
+          fi
+          echo "PASS"
