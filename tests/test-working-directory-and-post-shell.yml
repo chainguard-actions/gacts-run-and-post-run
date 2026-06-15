@@ -1,0 +1,31 @@
+name: Test working-directory and post-shell inputs
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Create working directory
+        run: mkdir -p /tmp/test-workdir
+      - id: action
+        uses: .
+        with:
+          run: pwd > /tmp/test-workdir/pwd-output.txt
+          post: echo "post step ran with sh shell"
+          working-directory: /tmp/test-workdir
+          shell: bash
+          post-shell: sh
+      - name: Assert working directory was used
+        run: |
+          if [ ! -f /tmp/test-workdir/pwd-output.txt ]; then
+            echo "FAIL: pwd-output.txt not found, working-directory may not have been used"
+            exit 1
+          fi
+          ACTUAL=$(cat /tmp/test-workdir/pwd-output.txt)
+          echo "actual pwd output: $ACTUAL"
+          if [ "$ACTUAL" != "/tmp/test-workdir" ]; then
+            echo "FAIL: expected working directory '/tmp/test-workdir', got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS"

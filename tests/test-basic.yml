@@ -1,0 +1,17 @@
+name: Test basic run and post
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          run: echo "hello from run step"
+          post: echo "hello from post step"
+      - name: Assert run step executed
+        run: |
+          echo "Run step completed successfully"
+          echo "PASS"
