@@ -6,22 +6,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - id: action
+      - name: Run action with post-shell specified
+        id: action
         uses: .
         with:
-          run: echo "run step executed" > /tmp/post-shell-run.txt
-          post: echo "post step with sh shell" > /tmp/post-shell-result.txt
+          run: echo "run-done" > /tmp/post-shell-test.txt
+          post: echo "post step with sh shell"
+          shell: bash
           post-shell: sh
-      - name: Assert run step executed
+      - name: Assert run command executed and action accepted post-shell input
         run: |
-          if [ ! -f /tmp/post-shell-run.txt ]; then
-            echo "FAIL: run step did not create output file"
+          if [ ! -f /tmp/post-shell-test.txt ]; then
+            echo "FAIL: /tmp/post-shell-test.txt not found — run command did not execute"
             exit 1
           fi
-          content=$(cat /tmp/post-shell-run.txt)
-          echo "actual: $content"
-          if [ "$content" != "run step executed" ]; then
-            echo "FAIL: expected 'run step executed', got '$content'"
+          CONTENT=$(cat /tmp/post-shell-test.txt | tr -d '[:space:]')
+          echo "content: $CONTENT"
+          if [ "$CONTENT" != "run-done" ]; then
+            echo "FAIL: expected 'run-done', got '$CONTENT'"
             exit 1
           fi
-          echo "PASS"
+          echo "PASS: action accepted post-shell input and run command executed"

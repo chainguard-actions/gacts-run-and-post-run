@@ -1,0 +1,29 @@
+name: Test custom shell input
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Run action with sh shell
+        id: action
+        uses: .
+        with:
+          run: echo "running in sh" > /tmp/shell-output.txt
+          post: echo "post with sh" > /tmp/post-shell-output.txt
+          shell: sh
+          post-shell: sh
+      - name: Assert run command executed with sh
+        run: |
+          if [ ! -f /tmp/shell-output.txt ]; then
+            echo "FAIL: run command did not create output file"
+            exit 1
+          fi
+          CONTENT=$(cat /tmp/shell-output.txt)
+          echo "actual: $CONTENT"
+          if [ "$CONTENT" != "running in sh" ]; then
+            echo "FAIL: expected 'running in sh' but got '$CONTENT'"
+            exit 1
+          fi
+          echo "PASS"

@@ -6,24 +6,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - name: Create working directory
-        run: mkdir -p /tmp/test-workdir
-      - id: action
+      - name: Create a working directory with a marker file
+        run: |
+          mkdir -p /tmp/test-workdir
+          echo "marker" > /tmp/test-workdir/marker.txt
+      - name: Run action with working-directory
+        id: action
         uses: .
         with:
-          run: pwd > /tmp/workdir-result.txt
+          run: pwd > /tmp/workdir-result.txt && ls marker.txt >> /tmp/workdir-result.txt
           post: echo "post done"
           working-directory: /tmp/test-workdir
       - name: Assert working directory was used
         run: |
           if [ ! -f /tmp/workdir-result.txt ]; then
-            echo "FAIL: run step did not create result file"
+            echo "FAIL: run command did not create result file"
             exit 1
           fi
-          content=$(cat /tmp/workdir-result.txt)
-          echo "actual: $content"
-          if [ "$content" != "/tmp/test-workdir" ]; then
-            echo "FAIL: expected '/tmp/test-workdir', got '$content'"
+          CONTENT=$(cat /tmp/workdir-result.txt)
+          echo "actual: $CONTENT"
+          if ! grep -q "/tmp/test-workdir" /tmp/workdir-result.txt; then
+            echo "FAIL: expected working directory '/tmp/test-workdir' in output"
+            exit 1
+          fi
+          if ! grep -q "marker.txt" /tmp/workdir-result.txt; then
+            echo "FAIL: expected 'marker.txt' to be listed in working directory"
             exit 1
           fi
           echo "PASS"
