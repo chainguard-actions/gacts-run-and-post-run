@@ -1,0 +1,27 @@
+name: Test custom shell input
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          run: echo "running in sh" > /tmp/shell-test.txt
+          post: echo "post done"
+          shell: sh
+      - name: Assert command ran with sh shell
+        run: |
+          if [ ! -f /tmp/shell-test.txt ]; then
+            echo "FAIL: /tmp/shell-test.txt not found"
+            exit 1
+          fi
+          CONTENT="$(cat /tmp/shell-test.txt | tr -d '[:space:]')"
+          echo "actual: $CONTENT"
+          if [ "$CONTENT" != "runninginsh" ]; then
+            echo "FAIL: expected 'runninginsh' (trimmed) but got '$CONTENT'"
+            exit 1
+          fi
+          echo "PASS"

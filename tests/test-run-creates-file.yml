@@ -1,0 +1,27 @@
+name: Test run command creates file
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          run: |
+            echo "test-content" > /tmp/run-test-output.txt
+          post: echo "post step done"
+      - name: Assert file was created by run command
+        run: |
+          if [ ! -f /tmp/run-test-output.txt ]; then
+            echo "FAIL: expected /tmp/run-test-output.txt to exist"
+            exit 1
+          fi
+          CONTENT="$(cat /tmp/run-test-output.txt)"
+          echo "actual content: $CONTENT"
+          if [ "$CONTENT" != "test-content" ]; then
+            echo "FAIL: expected 'test-content' but got '$CONTENT'"
+            exit 1
+          fi
+          echo "PASS"

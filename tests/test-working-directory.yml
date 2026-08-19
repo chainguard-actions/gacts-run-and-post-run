@@ -1,4 +1,4 @@
-name: Test working-directory and shell inputs
+name: Test working-directory input
 on:
   workflow_dispatch:
 jobs:
@@ -6,21 +6,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - name: Create test directory
-        run: mkdir -p /tmp/test-workdir && echo "marker" > /tmp/test-workdir/marker.txt
+      - name: Create working directory with a marker file
+        run: |
+          mkdir -p /tmp/test-workdir
+          echo "marker" > /tmp/test-workdir/marker.txt
       - id: action
         uses: .
         with:
-          run: |
-            if [ ! -f marker.txt ]; then
-              echo "FAIL: marker.txt not found in working directory"
-              exit 1
-            fi
-            echo "PASS: working directory is correct"
-          post: echo "post step done"
+          run: pwd > /tmp/workdir-result.txt
+          post: echo "post done"
           working-directory: /tmp/test-workdir
-          shell: bash
-      - name: Assert action completed
+      - name: Assert working directory was used
         run: |
-          echo "Action with working-directory completed successfully"
+          if [ ! -f /tmp/workdir-result.txt ]; then
+            echo "FAIL: /tmp/workdir-result.txt not found"
+            exit 1
+          fi
+          ACTUAL="$(cat /tmp/workdir-result.txt | tr -d '[:space:]')"
+          echo "actual pwd: $ACTUAL"
+          if [ "$ACTUAL" != "/tmp/test-workdir" ]; then
+            echo "FAIL: expected working directory '/tmp/test-workdir' but got '$ACTUAL'"
+            exit 1
+          fi
           echo "PASS"

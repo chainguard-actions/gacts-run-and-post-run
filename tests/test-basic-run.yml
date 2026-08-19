@@ -1,4 +1,4 @@
-name: Test post-shell input
+name: Test basic run command
 on:
   workflow_dispatch:
 jobs:
@@ -9,10 +9,8 @@ jobs:
       - id: action
         uses: .
         with:
-          run: echo "main run step"
-          post: echo "post with sh shell" > /tmp/post-shell-test.txt
-          shell: bash
-          post-shell: sh
-      - name: Assert main run step completed
+          run: echo "hello from run"
+          post: echo "hello from post"
+      - name: Assert run executed
         run: |
           echo "PASS: action completed without error"

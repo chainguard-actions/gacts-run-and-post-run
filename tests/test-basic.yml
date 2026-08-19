@@ -1,4 +1,4 @@
-name: Test basic run and post
+name: Test basic run and post-run
 on:
   workflow_dispatch:
 jobs:
@@ -6,12 +6,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Create output file for run step
+        run: echo "" > /tmp/run-output.txt
+
       - id: action
         uses: .
         with:
-          run: echo "hello from run step"
-          post: echo "hello from post step"
-      - name: Assert run step executed
+          run: echo "hello from run" > /tmp/run-output.txt
+          post: echo "hello from post" > /tmp/post-output.txt
+
+      - name: Assert run command executed
         run: |
-          echo "Run step completed successfully"
+          content=$(cat /tmp/run-output.txt)
+          echo "run output: $content"
+          if [ "$content" != "hello from run" ]; then
+            echo "FAIL: expected 'hello from run', got '$content'"
+            exit 1
+          fi
           echo "PASS"

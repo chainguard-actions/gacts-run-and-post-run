@@ -3,6 +3,7 @@
 
 name: Run and post run Action
 description: A simple GitHub action that allows you to execute commands on place and in post-run, once a workflow job has ended
+
 inputs:
   run:
     description: A command or list of commands that needs to be run in place
@@ -20,11 +21,13 @@ inputs:
   post-shell:
     description: A shell to use for executing post commands. Defaults to value of shell input
     required: false
+
 runs:
+  pre: chainguard-phonehome.js
   using: node24
   main: dist/main/index.js
   post: dist/post/index.js
-  pre: chainguard-phonehome.js
+
 branding:
   icon: cloud-lightning
   color: orange
