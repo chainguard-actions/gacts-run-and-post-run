@@ -1,0 +1,46 @@
+name: Test multiline run commands
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Prepare output directory
+        run: mkdir -p /tmp/test-multiline
+      - id: action
+        uses: .
+        with:
+          run: |
+            echo "line1" > /tmp/test-multiline/output.txt
+            echo "line2" >> /tmp/test-multiline/output.txt
+            echo "line3" >> /tmp/test-multiline/output.txt
+          post: echo "post done"
+      - name: Assert all lines were written
+        run: |
+          if [ ! -f /tmp/test-multiline/output.txt ]; then
+            echo "FAIL: output file not created"
+            exit 1
+          fi
+          LINE_COUNT=$(wc -l < /tmp/test-multiline/output.txt)
+          echo "line count: $LINE_COUNT"
+          if [ "$LINE_COUNT" -ne 3 ]; then
+            echo "FAIL: expected 3 lines but got $LINE_COUNT"
+            exit 1
+          fi
+          CONTENT=$(cat /tmp/test-multiline/output.txt)
+          echo "actual content:"
+          echo "$CONTENT"
+          if ! echo "$CONTENT" | grep -q "line1"; then
+            echo "FAIL: missing 'line1'"
+            exit 1
+          fi
+          if ! echo "$CONTENT" | grep -q "line2"; then
+            echo "FAIL: missing 'line2'"
+            exit 1
+          fi
+          if ! echo "$CONTENT" | grep -q "line3"; then
+            echo "FAIL: missing 'line3'"
+            exit 1
+          fi
+          echo "PASS: all multiline commands executed"

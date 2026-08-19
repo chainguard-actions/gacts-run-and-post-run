@@ -6,13 +6,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Prepare output directory
+        run: mkdir -p /tmp/test-post-shell
       - id: action
         uses: .
         with:
-          run: echo "run step with bash"
-          post: echo "post step with sh"
+          run: echo "main ran with bash" > /tmp/test-post-shell/main.txt
+          post: echo "post ran with sh" > /tmp/test-post-shell/post.txt
           shell: bash
           post-shell: sh
-      - name: Assert action completed
+      - name: Assert main run command executed with bash
         run: |
-          echo "PASS: action with post-shell completed successfully"
+          if [ ! -f /tmp/test-post-shell/main.txt ]; then
+            echo "FAIL: main output file not created"
+            exit 1
+          fi
+          CONTENT=$(cat /tmp/test-post-shell/main.txt)
+          echo "actual: $CONTENT"
+          if [ "$CONTENT" != "main ran with bash" ]; then
+            echo "FAIL: expected 'main ran with bash' but got '$CONTENT'"
+            exit 1
+          fi
+          echo "PASS: main command executed with bash"

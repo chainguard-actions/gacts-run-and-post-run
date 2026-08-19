@@ -1,0 +1,28 @@
+name: Test post-run command execution
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Prepare output directory
+        run: mkdir -p /tmp/test-post-run
+      - id: action
+        uses: .
+        with:
+          run: echo "main step ran" > /tmp/test-post-run/main.txt
+          post: echo "post step ran" > /tmp/test-post-run/post.txt
+      - name: Assert main run executed
+        run: |
+          if [ ! -f /tmp/test-post-run/main.txt ]; then
+            echo "FAIL: main run command did not execute"
+            exit 1
+          fi
+          CONTENT=$(cat /tmp/test-post-run/main.txt)
+          echo "actual: $CONTENT"
+          if [ "$CONTENT" != "main step ran" ]; then
+            echo "FAIL: expected 'main step ran' but got '$CONTENT'"
+            exit 1
+          fi
+          echo "PASS: main run command executed"

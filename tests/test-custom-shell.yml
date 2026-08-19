@@ -1,0 +1,29 @@
+name: Test custom shell input
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Prepare output directory
+        run: mkdir -p /tmp/test-custom-shell
+      - id: action
+        uses: .
+        with:
+          run: echo "ran with sh" > /tmp/test-custom-shell/output.txt
+          post: echo "post with sh" > /tmp/test-custom-shell/post-output.txt
+          shell: sh
+      - name: Assert command ran with sh shell
+        run: |
+          if [ ! -f /tmp/test-custom-shell/output.txt ]; then
+            echo "FAIL: output file not created by sh shell"
+            exit 1
+          fi
+          CONTENT=$(cat /tmp/test-custom-shell/output.txt)
+          echo "actual: $CONTENT"
+          if [ "$CONTENT" != "ran with sh" ]; then
+            echo "FAIL: expected 'ran with sh' but got '$CONTENT'"
+            exit 1
+          fi
+          echo "PASS: custom shell (sh) executed command successfully"

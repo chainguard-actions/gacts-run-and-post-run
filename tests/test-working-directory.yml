@@ -6,19 +6,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - name: Create test directory
-        run: mkdir -p /tmp/test-workdir && echo "marker" > /tmp/test-workdir/marker.txt
+      - name: Prepare working directory
+        run: |
+          mkdir -p /tmp/test-workdir
+          echo "fixture-content" > /tmp/test-workdir/fixture.txt
       - id: action
         uses: .
         with:
-          run: |
-            if [ ! -f marker.txt ]; then
-              echo "FAIL: marker.txt not found in working directory"
-              exit 1
-            fi
-            echo "PASS: working directory is correct"
-          post: echo "post step done"
+          run: pwd > /tmp/test-workdir/pwd-output.txt && ls fixture.txt >> /tmp/test-workdir/pwd-output.txt
+          post: echo "post done"
           working-directory: /tmp/test-workdir
-      - name: Assert action completed
+      - name: Assert working directory was used
         run: |
-          echo "PASS: action with working-directory completed successfully"
+          if [ ! -f /tmp/test-workdir/pwd-output.txt ]; then
+            echo "FAIL: pwd output file not created"
+            exit 1
+          fi
+          CONTENT=$(cat /tmp/test-workdir/pwd-output.txt)
+          echo "actual: $CONTENT"
+          if ! echo "$CONTENT" | grep -q "test-workdir"; then
+            echo "FAIL: expected working directory path to contain 'test-workdir'"
+            exit 1
+          fi
+          if ! echo "$CONTENT" | grep -q "fixture.txt"; then
+            echo "FAIL: expected 'fixture.txt' to be listed in working directory"
+            exit 1
+          fi
+          echo "PASS: working directory was used correctly"
