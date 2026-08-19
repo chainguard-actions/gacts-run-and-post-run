@@ -1,0 +1,41 @@
+name: Test multiline run commands
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          run: |
+            echo "line1" > /tmp/test-multiline.txt
+            echo "line2" >> /tmp/test-multiline.txt
+            echo "line3" >> /tmp/test-multiline.txt
+          post: |
+            echo "post line1"
+            echo "post line2"
+      - name: Assert multiline run commands executed
+        run: |
+          if [ ! -f /tmp/test-multiline.txt ]; then
+            echo "FAIL: test-multiline.txt not found — run commands did not execute"
+            exit 1
+          fi
+          LINE_COUNT="$(wc -l < /tmp/test-multiline.txt)"
+          echo "line count: $LINE_COUNT"
+          if [ "$LINE_COUNT" -ne 3 ]; then
+            echo "FAIL: expected 3 lines but got $LINE_COUNT"
+            exit 1
+          fi
+          FIRST="$(sed -n '1p' /tmp/test-multiline.txt)"
+          SECOND="$(sed -n '2p' /tmp/test-multiline.txt)"
+          THIRD="$(sed -n '3p' /tmp/test-multiline.txt)"
+          echo "line1: $FIRST"
+          echo "line2: $SECOND"
+          echo "line3: $THIRD"
+          if [ "$FIRST" != "line1" ] || [ "$SECOND" != "line2" ] || [ "$THIRD" != "line3" ]; then
+            echo "FAIL: unexpected content in multiline output"
+            exit 1
+          fi
+          echo "PASS: multiline run commands executed correctly"

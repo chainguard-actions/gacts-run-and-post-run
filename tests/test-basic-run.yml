@@ -1,0 +1,28 @@
+name: Test basic run command
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Create output file location
+        run: mkdir -p /tmp/test-run-and-post
+      - id: action
+        uses: .
+        with:
+          run: echo "hello from run" > /tmp/test-run-and-post/run-output.txt
+          post: echo "hello from post" > /tmp/test-run-and-post/post-output.txt
+      - name: Assert run command executed
+        run: |
+          if [ ! -f /tmp/test-run-and-post/run-output.txt ]; then
+            echo "FAIL: run-output.txt not found — run command did not execute"
+            exit 1
+          fi
+          CONTENT="$(cat /tmp/test-run-and-post/run-output.txt)"
+          echo "actual: $CONTENT"
+          if [ "$CONTENT" != "hello from run" ]; then
+            echo "FAIL: expected 'hello from run' but got '$CONTENT'"
+            exit 1
+          fi
+          echo "PASS: run command executed correctly"

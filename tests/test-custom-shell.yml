@@ -1,0 +1,27 @@
+name: Test custom shell input
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          run: echo "running in sh" > /tmp/test-shell-output.txt
+          post: echo "post done"
+          shell: sh
+      - name: Assert command ran with sh shell
+        run: |
+          if [ ! -f /tmp/test-shell-output.txt ]; then
+            echo "FAIL: test-shell-output.txt not found — run command did not execute"
+            exit 1
+          fi
+          CONTENT="$(cat /tmp/test-shell-output.txt)"
+          echo "actual: $CONTENT"
+          if [ "$CONTENT" != "running in sh" ]; then
+            echo "FAIL: expected 'running in sh' but got '$CONTENT'"
+            exit 1
+          fi
+          echo "PASS: command ran successfully with sh shell"
