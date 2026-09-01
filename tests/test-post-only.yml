@@ -1,0 +1,20 @@
+name: Test post-only (no in-place run)
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Prepare temp directory
+        run: mkdir -p /tmp/post-only-test
+
+      - id: action
+        uses: .
+        with:
+          post: echo "post-only ran" > /tmp/post-only-test/post-marker.txt
+
+      - name: Assert action step succeeded (no run input is valid)
+        run: |
+          echo "PASS: action step completed without error (post-only mode)"

@@ -1,0 +1,77 @@
+import { getMultilineInput, getInput, info, setFailed } from '@actions/core' // https://github.com/actions/toolkit/tree/main/packages/core
+import { exec } from '@actions/exec' // https://github.com/actions/toolkit/tree/main/packages/exec
+import process from 'process'
+
+// read action inputs
+const input = {
+  run: getMultilineInput('run'),
+  post: getMultilineInput('post', {required: true}),
+  workingDirectory: getInput('working-directory'),
+  shell: getInput('shell'),
+  postShell: getInput('post-shell'),
+}
+
+export async function run() {
+  return runCommands(joinMultilineCommands(input.run), input.shell)
+}
+
+export async function post() {
+  return runCommands(joinMultilineCommands(input.post), input.postShell ? input.postShell : input.shell)
+}
+
+/**
+ * @param {String[]} commands
+ * @return {String[]}
+ */
+function joinMultilineCommands(commands) {
+  const result = []
+  const re = /\\\s*$/
+  const buf = []
+
+  for (const cmd of commands) {
+    buf.push(cmd.replace(re, '')) // push command into buffer
+
+    if (!re.test(cmd)) { // if command not ends with \
+      result.push(buf.join(' ')) // join buffer and push into result
+
+      buf.length = 0 // clear buffer
+    }
+  }
+
+  return result
+}
+
+/**
+ * @param {String[]} commands
+ * @param {String} shell
+ *
+ * @return {Promise<void>}
+ */
+async function runCommands(commands, shell) {
+  /** @type {import('@actions/exec/lib/interfaces').ExecOptions} */
+  const options = {
+    cwd: input.workingDirectory,
+    env: process.env,
+    silent: true,
+    listeners: {
+      stdline: (data) => info(data),
+      errline: (data) => info(data),
+    },
+  }
+
+  return (async () => {
+    for (const command of commands) {
+      if (command && command.trim() !== '') {
+        info(`\x1b[1m$ ${command}\x1b[0m`)
+
+        const exitCode = shell === ''
+          ? await exec(command, [], options)
+          : await exec(shell, ['-c', command], options)
+
+        if (exitCode !== 0) {
+          setFailed(`Command failed with exit code ${exitCode}`)
+        }
+      }
+    }
+  })().catch(error => setFailed(error.message))
+}

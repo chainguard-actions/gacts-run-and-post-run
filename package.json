@@ -1,0 +1,41 @@
+{
+  "name": "run-and-post-run",
+  "description": "A simple GitHub action that allows you to execute commands on place and in post-run, once a workflow job has ended",
+  "scripts": {
+    "lint": "eslint './src/**/*.js'",
+    "build:main": "ncc build -o dist/main --minify --no-cache src/main.js",
+    "build:post": "ncc build -o dist/post --minify --no-cache src/post.js",
+    "build": "npm run build:main && npm run build:post"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gacts/run-and-post-run.git"
+  },
+  "keywords": [
+    "github",
+    "actions"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gacts/run-and-post-run/issues"
+  },
+  "type": "module",
+  "homepage": "https://github.com/gacts/run-and-post-run#readme",
+  "dependencies": {
+    "@actions/core": "^3.0.1",
+    "@actions/exec": "^3.0.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.6",
+    "@eslint/js": "^10.0.1",
+    "@vercel/ncc": "^0.45.0",
+    "eslint": "^10.9.1",
+    "globals": "^17.11.0"
+  },
+  "volta": {
+    "node": "24"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

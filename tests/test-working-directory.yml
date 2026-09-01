@@ -1,0 +1,39 @@
+name: Test working-directory input
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Create working directory with a known file
+        run: |
+          mkdir -p /tmp/workdir-test
+          echo "sentinel" > /tmp/workdir-test/sentinel.txt
+
+      - id: action
+        uses: .
+        with:
+          run: pwd > /tmp/workdir-test/pwd-output.txt && ls sentinel.txt >> /tmp/workdir-test/pwd-output.txt
+          post: echo "post from workdir" > /tmp/workdir-test/post-output.txt
+          working-directory: /tmp/workdir-test
+
+      - name: Assert command ran in the correct working directory
+        run: |
+          if [ ! -f /tmp/workdir-test/pwd-output.txt ]; then
+            echo "FAIL: pwd-output.txt not found"
+            exit 1
+          fi
+          ACTUAL_PWD=$(head -1 /tmp/workdir-test/pwd-output.txt)
+          echo "actual pwd: $ACTUAL_PWD"
+          if [ "$ACTUAL_PWD" != "/tmp/workdir-test" ]; then
+            echo "FAIL: expected working directory '/tmp/workdir-test', got '$ACTUAL_PWD'"
+            exit 1
+          fi
+          # Verify sentinel.txt was visible (ls succeeded)
+          if ! grep -q "sentinel.txt" /tmp/workdir-test/pwd-output.txt; then
+            echo "FAIL: sentinel.txt not found in ls output — working-directory may not have been set"
+            exit 1
+          fi
+          echo "PASS: command ran in correct working directory"

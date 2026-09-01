@@ -1,0 +1,36 @@
+name: Test shell selection input
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Prepare temp directory
+        run: mkdir -p /tmp/shell-test
+
+      - id: action
+        uses: .
+        with:
+          run: |
+            # Use a POSIX sh feature: $0 contains the shell name
+            echo "$0" > /tmp/shell-test/shell-name.txt
+          post: echo "post shell done" > /tmp/shell-test/post-shell.txt
+          shell: sh
+
+      - name: Assert sh was used as the shell
+        run: |
+          if [ ! -f /tmp/shell-test/shell-name.txt ]; then
+            echo "FAIL: shell-name.txt not found — run command did not execute"
+            exit 1
+          fi
+          SHELL_USED=$(cat /tmp/shell-test/shell-name.txt)
+          echo "shell used: $SHELL_USED"
+          # $0 in sh is typically "sh" or the path to sh (e.g. /bin/sh)
+          if echo "$SHELL_USED" | grep -qE '(^sh$|/sh$|^/bin/sh$)'; then
+            echo "PASS: sh shell was used"
+          else
+            echo "FAIL: expected sh shell, got '$SHELL_USED'"
+            exit 1
+          fi

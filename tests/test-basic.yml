@@ -1,0 +1,31 @@
+name: Test basic run and post-run
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Create marker files directory
+        run: mkdir -p /tmp/run-post-test
+
+      - id: action
+        uses: .
+        with:
+          run: echo "in-place command ran" > /tmp/run-post-test/run-marker.txt
+          post: echo "post-run command ran" > /tmp/run-post-test/post-marker.txt
+
+      - name: Assert in-place run executed
+        run: |
+          if [ ! -f /tmp/run-post-test/run-marker.txt ]; then
+            echo "FAIL: run-marker.txt not found — in-place command did not execute"
+            exit 1
+          fi
+          CONTENT=$(cat /tmp/run-post-test/run-marker.txt)
+          echo "run marker content: $CONTENT"
+          if [ "$CONTENT" != "in-place command ran" ]; then
+            echo "FAIL: unexpected content in run-marker.txt"
+            exit 1
+          fi
+          echo "PASS: in-place run executed correctly"

@@ -1,0 +1,44 @@
+name: Test multi-line run and post commands
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Prepare temp directory
+        run: mkdir -p /tmp/multiline-test
+
+      - id: action
+        uses: .
+        with:
+          run: |
+            echo "line1" > /tmp/multiline-test/run-output.txt
+            echo "line2" >> /tmp/multiline-test/run-output.txt
+            echo "line3" >> /tmp/multiline-test/run-output.txt
+          post: |
+            echo "post-line1" > /tmp/multiline-test/post-output.txt
+            echo "post-line2" >> /tmp/multiline-test/post-output.txt
+
+      - name: Assert all run lines were written
+        run: |
+          if [ ! -f /tmp/multiline-test/run-output.txt ]; then
+            echo "FAIL: run-output.txt not found"
+            exit 1
+          fi
+          LINE_COUNT=$(wc -l < /tmp/multiline-test/run-output.txt)
+          echo "line count: $LINE_COUNT"
+          if [ "$LINE_COUNT" -ne 3 ]; then
+            echo "FAIL: expected 3 lines in run-output.txt, got $LINE_COUNT"
+            exit 1
+          fi
+          if ! grep -q "line1" /tmp/multiline-test/run-output.txt; then
+            echo "FAIL: 'line1' not found in run-output.txt"
+            exit 1
+          fi
+          if ! grep -q "line3" /tmp/multiline-test/run-output.txt; then
+            echo "FAIL: 'line3' not found in run-output.txt"
+            exit 1
+          fi
+          echo "PASS: all multi-line run commands executed"
