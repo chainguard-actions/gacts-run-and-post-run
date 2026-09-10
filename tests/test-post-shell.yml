@@ -9,10 +9,10 @@ jobs:
       - id: action
         uses: .
         with:
-          run: echo "main step running"
-          post: echo "post step running with custom shell"
+          run: echo "main step running in bash"
+          post: echo "post step running in sh"
           shell: bash
           post-shell: sh
-      - name: Assert main step ran
+      - name: Assert main step ran successfully
         run: |
-          echo "PASS: action completed without error"
+          echo "PASS: action with post-shell input completed successfully"
