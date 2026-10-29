@@ -6,13 +6,13 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 
 ## Versions
 
-| Version | Tag | Upstream commit |
-|---------|-----|-----------------|
-| v1.4.1 | [`v1.4.1`](https://github.com/chainguard-actions/gacts-run-and-post-run/tree/v1.4.1) | [`4683764`](https://github.com/gacts/run-and-post-run/commit/4683764dd706df847f57b9bed39d08164bcd2690) |
-| v1.4.2 | [`v1.4.2`](https://github.com/chainguard-actions/gacts-run-and-post-run/tree/v1.4.2) | [`d803f69`](https://github.com/gacts/run-and-post-run/commit/d803f6920adc9a47eeac4cb6c93dbc2e2890c684) |
-| v1.4.3 | [`v1.4.3`](https://github.com/chainguard-actions/gacts-run-and-post-run/tree/v1.4.3) | [`81b6ce5`](https://github.com/gacts/run-and-post-run/commit/81b6ce503cde93862cec047c54652e45c5dca991) |
-| v1.4.4 | [`v1.4.4`](https://github.com/chainguard-actions/gacts-run-and-post-run/tree/v1.4.4) | [`598d7a8`](https://github.com/gacts/run-and-post-run/commit/598d7a875d5620e0457490555b5e18e46082aa47) |
-| v1.4.5 | [`v1.4.5`](https://github.com/chainguard-actions/gacts-run-and-post-run/tree/v1.4.5) | [`fc65038`](https://github.com/gacts/run-and-post-run/commit/fc6503862aba998e2f2123225ad63c09a92ed46e) |
+| Version | Tag | Upstream commit | Hardening report |
+|---------|-----|-----------------|------------------|
+| v1.4.1 | [`v1.4.1`](https://github.com/chainguard-actions/gacts-run-and-post-run/tree/v1.4.1) | [`4683764`](https://github.com/gacts/run-and-post-run/commit/4683764dd706df847f57b9bed39d08164bcd2690) | [`HARDENING.md`](https://github.com/chainguard-actions/gacts-run-and-post-run/blob/v1.4.1/HARDENING.md) |
+| v1.4.2 | [`v1.4.2`](https://github.com/chainguard-actions/gacts-run-and-post-run/tree/v1.4.2) | [`d803f69`](https://github.com/gacts/run-and-post-run/commit/d803f6920adc9a47eeac4cb6c93dbc2e2890c684) | [`HARDENING.md`](https://github.com/chainguard-actions/gacts-run-and-post-run/blob/v1.4.2/HARDENING.md) |
+| v1.4.3 | [`v1.4.3`](https://github.com/chainguard-actions/gacts-run-and-post-run/tree/v1.4.3) | [`81b6ce5`](https://github.com/gacts/run-and-post-run/commit/81b6ce503cde93862cec047c54652e45c5dca991) | [`HARDENING.md`](https://github.com/chainguard-actions/gacts-run-and-post-run/blob/v1.4.3/HARDENING.md) |
+| v1.4.4 | [`v1.4.4`](https://github.com/chainguard-actions/gacts-run-and-post-run/tree/v1.4.4) | [`598d7a8`](https://github.com/gacts/run-and-post-run/commit/598d7a875d5620e0457490555b5e18e46082aa47) | [`HARDENING.md`](https://github.com/chainguard-actions/gacts-run-and-post-run/blob/v1.4.4/HARDENING.md) |
+| v1.4.5 | [`v1.4.5`](https://github.com/chainguard-actions/gacts-run-and-post-run/tree/v1.4.5) | [`fc65038`](https://github.com/gacts/run-and-post-run/commit/fc6503862aba998e2f2123225ad63c09a92ed46e) | [`HARDENING.md`](https://github.com/chainguard-actions/gacts-run-and-post-run/blob/v1.4.5/HARDENING.md) |
 
 ## Privacy
 
